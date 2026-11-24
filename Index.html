@@ -1,0 +1,515 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Swedish 🇸🇪</title>
+
+<style>
+:root {
+  --blue: #1769aa;
+  --yellow: #ffcf33;
+  --background: #f3f6fa;
+  --card: #ffffff;
+  --text: #243247;
+  --muted: #66758a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+header {
+  background: var(--blue);
+  color: white;
+  text-align: center;
+  padding: 30px 15px;
+  border-bottom: 7px solid var(--yellow);
+}
+
+header h1 { margin: 0; font-size: 2rem; }
+header p { margin: 8px 0 0; }
+
+.container {
+  max-width: 950px;
+  margin: 25px auto;
+  padding: 0 15px;
+}
+
+.datebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  background: var(--blue);
+  color: white;
+  font-size: 14px;
+}
+
+button:hover { opacity: .85; }
+
+button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.card {
+  background: var(--card);
+  padding: 22px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px #0000000c;
+}
+
+.card h2 {
+  color: var(--blue);
+  margin-top: 0;
+  border-bottom: 2px solid var(--yellow);
+  padding-bottom: 10px;
+}
+
+.item {
+  padding: 13px 0;
+  border-bottom: 1px solid #e8edf3;
+}
+
+.item:last-child { border-bottom: none; }
+
+.swedish {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.english {
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.speak {
+  margin-left: 8px;
+  padding: 6px 10px;
+  background: #e5f1fb;
+  color: var(--blue);
+}
+
+.learned {
+  background: #e9f7ed;
+  color: #26753c;
+  margin-left: 5px;
+  padding: 6px 9px;
+}
+
+.grammar {
+  background: #fff8df;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  color: var(--muted);
+}
+
+.progress {
+  background: #e1e8f0;
+  border-radius: 20px;
+  height: 12px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress div {
+  background: #39a66b;
+  height: 100%;
+  width: 0%;
+  transition: width .3s;
+}
+
+@media(max-width:600px) {
+  header h1 { font-size: 1.6rem; }
+  .card { padding: 16px; }
+  .swedish { font-size: 16px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🇸🇪 Daily Swedish</h1>
+  <p>Learn Swedish a little every day!</p>
+  <p>5 sentences · 5 words · Expressions · Grammar</p>
+</header>
+
+<main class="container">
+
+  <div class="datebar">
+    <button onclick="changeDay(-1)">← Previous day</button>
+    <strong id="lessonDate"></strong>
+    <button id="nextButton" onclick="changeDay(1)">Next day →</button>
+  </div>
+
+  <section class="card">
+    <h2>📚 Today's progress</h2>
+    <p id="progressText">0 items learned</p>
+    <div class="progress">
+      <div id="progressBar"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>💬 5 Swedish sentences</h2>
+    <div id="sentences"></div>
+  </section>
+
+  <section class="card">
+    <h2>📖 5 New words</h2>
+    <div id="words"></div>
+  </section>
+
+  <section class="card">
+    <h2>🗣️ Useful expressions</h2>
+    <div id="expressions"></div>
+  </section>
+
+  <section class="card">
+    <h2>✏️ Daily grammar</h2>
+    <div id="grammar"></div>
+  </section>
+
+  <section class="card">
+    <h2>⭐ Daily challenge</h2>
+    <p id="challenge"></p>
+    <button onclick="showAnswer()">Show suggested answer</button>
+    <p id="answer" hidden></p>
+  </section>
+
+  <section class="card">
+    <h2>🔊 Pronunciation help</h2>
+    <p>Press the speaker button next to any Swedish word or sentence to hear it spoken aloud.</p>
+    <button onclick="speak('Hej! Hur mår du?')">
+      🔊 Listen to Swedish
+    </button>
+    <p class="english">Pronunciation uses your browser's Swedish text-to-speech voice, if available.</p>
+  </section>
+
+</main>
+
+<footer>
+  <p>🇸🇪 Daily Swedish | One day at a time!</p>
+</footer>
+
+<script>
+
+// Daily learning material
+// Add more lessons to this collection whenever you like.
+
+const lessons = [
+
+{
+sentences: [
+["Hej! Hur mår du?", "Hello! How are you?"],
+["Jag heter Anna.", "My name is Anna."],
+["Jag bor i Sverige.", "I live in Sweden."],
+["Vad gör du idag?", "What are you doing today?"],
+["Det är väldigt fint väder.", "The weather is very nice."]
+],
+words: [
+["Hej", "Hello"],
+["Tack", "Thank you"],
+["Vän", "Friend"],
+["Hus", "House"],
+["Vatten", "Water"]
+],
+expressions: [
+["Ingen fara!", "No worries!"],
+["Vad roligt!", "How fun!"],
+["Vi ses!", "See you!"]
+],
+grammar: [
+["Personal pronouns",
+"Jag = I, du = you, han = he, hon = she, vi = we, ni = you (plural), de = they."],
+["Verb in Swedish",
+"Swedish verbs generally do not change according to the subject. Jag bor, du bor, vi bor (I live, you live, we live)."]
+],
+challenge: "Introduce yourself in Swedish.",
+answer: "Hej! Jag heter Anna. Jag bor i Sverige. Jag lär mig svenska."
+},
+
+{
+sentences: [
+["God morgon! Hur sov du?", "Good morning! How did you sleep?"],
+["Jag dricker kaffe varje morgon.", "I drink coffee every morning."],
+["Idag ska jag arbeta.", "Today I am going to work."],
+["Kan du hjälpa mig?", "Can you help me?"],
+["Jag förstår lite svenska.", "I understand a little Swedish."]
+],
+words: [
+["Morgon", "Morning"],
+["Arbete", "Work"],
+["Kaffe", "Coffee"],
+["Hjälpa", "To help"],
+["Förstå", "To understand"]
+],
+expressions: [
+["Absolut!", "Absolutely!"],
+["Självklart!", "Of course!"],
+["Det ordnar sig.", "It will work out."]
+],
+grammar: [
+["Present tense",
+"Many Swedish verbs form the present tense with -ar, -er or -r. Example: prata → pratar (speak)."],
+["Word order",
+"In a normal Swedish statement, the verb usually comes in second position: Idag arbetar jag (Today I work)."]
+],
+challenge: "Say three things you do every morning.",
+answer: "Jag vaknar. Jag dricker kaffe. Jag äter frukost."
+},
+
+{
+sentences: [
+["Jag tycker om att läsa.", "I like reading."],
+["Var ligger stationen?", "Where is the station?"],
+["Jag skulle vilja ha en kaffe.", "I would like a coffee."],
+["Vi ses imorgon.", "See you tomorrow."],
+["Kan jag få notan, tack?", "Can I have the bill, please?"]
+],
+words: [
+["Läsa", "To read"],
+["Station", "Station"],
+["Imorgon", "Tomorrow"],
+["Notan", "The bill"],
+["Tycka", "To think / feel"]
+],
+expressions: [
+["Det låter bra!", "That sounds good!"],
+["Ingen aning.", "No idea."],
+["Ha en trevlig dag!", "Have a nice day!"]
+],
+grammar: [
+["En and ett",
+"Swedish nouns have two grammatical genders: en and ett. Example: en bil (a car), ett hus (a house)."],
+["Definite nouns",
+"Add -en or -et to make many nouns definite: en bil → bilen, ett hus → huset."]
+],
+challenge: "Order a coffee in Swedish.",
+answer: "Hej! Jag skulle vilja ha en kaffe, tack."
+},
+
+{
+sentences: [
+["Jag är trött idag.", "I am tired today."],
+["Vad tycker du om Sverige?", "What do you think about Sweden?"],
+["Det är kallt ute.", "It is cold outside."],
+["Jag behöver köpa mat.", "I need to buy food."],
+["Vi ska träffas senare.", "We are going to meet later."]
+],
+words: [
+["Trött", "Tired"],
+["Kallt", "Cold"],
+["Mat", "Food"],
+["Senare", "Later"],
+["Behöver", "Need"]
+],
+expressions: [
+["Vad synd!", "What a pity!"],
+["Det spelar ingen roll.", "It doesn't matter."],
+["Jag håller med.", "I agree."]
+],
+grammar: [
+["Modal verbs",
+"Kan (can), vill (want), ska (will/going to), måste (must) are followed by the infinitive without att: Jag vill äta."],
+["Adjectives",
+"Adjectives often change depending on the noun: en stor bil, ett stort hus."]
+],
+challenge: "Describe how you feel and what you need.",
+answer: "Jag är trött. Jag behöver vila."
+}
+
+];
+
+// Set a date-based lesson
+const startDate = new Date(2026, 0, 1);
+let selectedDay = Math.floor(
+  (new Date().setHours(0,0,0,0) - startDate.getTime()) / 86400000
+);
+
+function getLesson(day) {
+  return lessons[((day % lessons.length) + lessons.length) % lessons.length];
+}
+
+function formatDate(day) {
+  const date = new Date(startDate);
+  date.setDate(date.getDate() + day);
+
+  return date.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) {
+    alert("Speech is not supported by this browser.");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "sv-SE";
+  speech.rate = 0.85;
+
+  const voices = window.speechSynthesis.getVoices();
+  const swedishVoice = voices.find(v =>
+    v.lang.toLowerCase().startsWith("sv")
+  );
+
+  if (swedishVoice) speech.voice = swedishVoice;
+
+  window.speechSynthesis.speak(speech);
+}
+
+function renderItems(containerId, items, prefix) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  items.forEach((item, index) => {
+    const id = `${prefix}-${selectedDay}-${index}`;
+    const learned = localStorage.getItem(id) === "true";
+
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const swedish = document.createElement("div");
+    swedish.className = "swedish";
+    swedish.textContent = item[0];
+
+    const speaker = document.createElement("button");
+    speaker.className = "speak";
+    speaker.textContent = "🔊";
+    speaker.setAttribute("aria-label", "Listen to Swedish");
+    speaker.onclick = () => speak(item[0]);
+
+    swedish.appendChild(speaker);
+
+    const english = document.createElement("div");
+    english.className = "english";
+    english.textContent = item[1];
+
+    const mark = document.createElement("button");
+    mark.className = "learned";
+    mark.textContent = learned ? "✓ Learned" : "Mark learned";
+    mark.onclick = () => {
+      localStorage.setItem(id, String(!learned));
+      render();
+    };
+
+    div.append(swedish, english, mark);
+    container.appendChild(div);
+  });
+}
+
+function render() {
+  const lesson = getLesson(selectedDay);
+
+  document.getElementById("lessonDate").textContent =
+    formatDate(selectedDay);
+
+  renderItems("sentences", lesson.sentences, "sentence");
+  renderItems("words", lesson.words, "word");
+  renderItems("expressions", lesson.expressions, "expression");
+
+  const grammar = document.getElementById("grammar");
+  grammar.innerHTML = "";
+
+  lesson.grammar.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "grammar";
+
+    const heading = document.createElement("h3");
+    heading.textContent = item[0];
+
+    const explanation = document.createElement("p");
+    explanation.textContent = item[1];
+
+    div.append(heading, explanation);
+    grammar.appendChild(div);
+  });
+
+  document.getElementById("challenge").textContent =
+    lesson.challenge;
+
+  document.getElementById("answer").hidden = true;
+  document.getElementById("answer").textContent =
+    lesson.answer;
+
+  document.getElementById("nextButton").disabled =
+    selectedDay >= Math.floor(
+      (new Date().setHours(0,0,0,0) - startDate.getTime()) /
+      86400000
+    );
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = 13;
+  let count = 0;
+
+  ["sentence", "word", "expression"].forEach(prefix => {
+    const amount = prefix === "sentence" || prefix === "word" ? 5 : 3;
+
+    for (let i = 0; i < amount; i++) {
+      const id = `${prefix}-${selectedDay}-${i}`;
+      if (localStorage.getItem(id) === "true") count++;
+    }
+  });
+
+  document.getElementById("progressText").textContent =
+    `${count} of ${total} items learned`;
+
+  document.getElementById("progressBar").style.width =
+    `${count / total * 100}%`;
+}
+
+function changeDay(amount) {
+  const maxDay = Math.floor(
+    (new Date().setHours(0,0,0,0) - startDate.getTime()) /
+    86400000
+  );
+
+  selectedDay = Math.max(0, Math.min(maxDay, selectedDay + amount));
+  render();
+}
+
+function showAnswer() {
+  document.getElementById("answer").hidden = false;
+}
+
+render();
+
+</script>
+
+</body>
+</html>
